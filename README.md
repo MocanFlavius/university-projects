@@ -1,4 +1,4 @@
-Web Portal
+Web Portal Project
 
 Technologies used: PHP, MySQL (managed via WAMP), HTML, CSS, Composer.
 Main features: CRUD operations, administration interface, database connectivity.
@@ -8,4 +8,4 @@ Installation and running:
     Ensure Apache and MySQL services are running in WAMP.
     Import the database structure.
     Access the project in your browser at http://localhost/your-folder-name.
-    (Optional) Run composer install in the terminal within the project folder to download the necessary dependencies from vendor
+    Run composer install in the terminal within the project folder to download the necessary dependencies from vendor
