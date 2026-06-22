@@ -1,0 +1,77 @@
+{% extends 'base.tpl.html' %}
+
+{% block content %}
+<div class="row mt-5 justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Editează: {{ gallery.title }}</h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="edit.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="id" value="{{ gallery.id }}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Titlul Galeriei</label>
+                        <input type="text" class="form-control" name="titlu" value="{{ gallery.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Scurtă Descriere</label>
+                        <input type="text" class="form-control" name="descriere_scurta" value="{{ gallery.title_description }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Descriere Detaliată</label>
+                        <textarea class="form-control" name="descriere_lunga" rows="5" required>{{ gallery.long_description }}</textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-primary">Schimbă Imaginea (Lasă gol dacă dorești să păstrezi poza curentă)</label>
+                        <div class="input-group">
+                            <input type="file" class="d-none" id="inputFisierEdit" name="poza" accept="image/jpeg, image/png">
+                            <label class="btn btn-outline-secondary" for="inputFisierEdit">Alege fișierul</label>
+                            <span class="form-control" id="numeFisierEdit">Niciun fișier ales</span>
+                        </div>
+                        <div class="mt-2 text-muted small">Imagine actuală în baza de date: <strong>{{ gallery.img }}</strong></div>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-light border rounded">
+                        <label class="form-label text-primary">Adaugă Imagini Carusel (Lasă gol dacă nu dorești să adaugi poze noi)</label>
+                        <div class="input-group">
+                            <input type="file" class="d-none" id="inputCaruselEdit" name="poze_carusel[]" accept="image/jpeg, image/png" multiple>
+                            <label class="btn btn-outline-primary" for="inputCaruselEdit">Alege fișierele</label>
+                            <span class="form-control" id="numeFisiereCaruselEdit">Niciun fișier ales</span>
+                        </div>
+                        <small class="text-muted d-block mt-1">Aceste imagini vor fi adăugate la caruselul existent al galeriei.</small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="admin.php" class="btn btn-outline-secondary">Anulează și întoarce-te</a>
+                        <button type="submit" class="btn btn-success px-4">Salvează Modificările</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pentru Imaginea de copertă
+    document.getElementById('inputFisierEdit').addEventListener('change', function(e) {
+        var fileName = e.target.files[0] ? e.target.files[0].name : "Niciun fișier ales";
+        document.getElementById('numeFisierEdit').textContent = fileName;
+    });
+
+    // Pentru Imaginile din carusel 
+    document.getElementById('inputCaruselEdit').addEventListener('change', function(e) {
+        let text = "Niciun fișier ales";
+        if (this.files && this.files.length > 1) {
+            text = this.files.length + " fișiere selectate";
+        } else if (this.files && this.files.length === 1) {
+            text = this.files[0].name;
+        }
+        document.getElementById('numeFisiereCaruselEdit').textContent = text;
+    });
+</script>
+{% endblock %}

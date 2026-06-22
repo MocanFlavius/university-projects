@@ -1,0 +1,78 @@
+{% extends 'base.tpl.html' %}
+
+{% block content %}
+<div class="row mt-4 mb-5">
+    <div class="col-lg-8 mx-auto">
+        
+        <a href="index.php" class="btn btn-outline-secondary mb-4">&larr; Înapoi la galerii</a>
+
+        <h1 class="mb-2 fw-bold">{{ gallery.title }}</h1>
+        <p class="lead text-muted mb-1">{{ gallery.title_description }}</p>
+        
+        <p class="small text-muted mb-4">Postat de: <strong class="text-dark">{{ gallery.autor_nume|default('Administrator') }}</strong></p>
+        
+        <img src="images/{{ gallery.img }}" class="img-fluid rounded shadow-sm mb-4 w-100" alt="{{ gallery.title }}" onerror="this.src='https://via.placeholder.com/1200x600?text=Fara+Poza'">
+
+        <div class="content fs-5 text-justify">
+            {{ gallery.long_description|nl2br }}
+        </div>
+
+        {% if poze|length > 0 %}
+        <div class="mt-5 mb-5">
+            <h4 class="mb-3">Galerie foto</h4>
+            <div id="carouselGalerie" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
+                <div class="carousel-inner rounded">
+                    {% for poza in poze %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="images/{{ poza.picture_path }}" class="d-block w-100" style="max-height: 500px; object-fit: cover;" alt="Imagine suplimentară">
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselGalerie" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselGalerie" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        <hr class="mt-5">
+        
+        <h4 class="mt-4 mb-4">Comentarii</h4>
+        
+        {% if session.logat %}
+            <div class="card bg-light mb-5 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <form action="gallery.php?id={{ gallery.id }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mesajul tău</label>
+                            <textarea class="form-control" name="comentariu" rows="3" placeholder="Ce părere ai despre această destinație?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4">Adaugă Comentariu</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-5">
+                Te rugăm să te <a href="login.php" class="alert-link">loghezi</a> pentru a putea adăuga un comentariu.
+            </div>
+        {% endif %}
+
+        <div class="comments-list">
+            {% for comment in comments %}
+                <div class="card mb-3 border-0 border-start border-4 border-primary shadow-sm bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-1">{{ comment.username }}</h6>
+                        <small class="text-muted d-block mb-3">{{ comment.created_at|date("d/m/Y H:i") }}</small>
+                        <p class="mb-0">{{ comment.comment|nl2br }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary border-0">Niciun comentariu până acum. Fii tu primul!</div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

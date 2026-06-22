@@ -1,0 +1,230 @@
+{% extends 'base.tpl.html' %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
+        <h2>Centrul de Comandă</h2>
+        <a href="logout.php" class="btn btn-outline-danger btn-sm">Deconectare</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm mb-5" style="max-width: 600px;">
+            <div class="card-header bg-primary" style="color: #ffffff !important;">
+                <h5 class="mb-0" style="color: #ffffff !important;">Adaugă o Galerie Nouă</h5>
+            </div>
+            <div class="card-body">
+                {% if mesaj %}<div class="alert alert-info">{{ mesaj }}</div>{% endif %}
+                <form action="admin.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Titlul Galeriei</label>
+                        <input type="text" class="form-control" name="titlu" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Scurtă Descriere</label>
+                        <input type="text" class="form-control" name="descriere_scurta" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descriere Detaliată</label>
+                        <textarea class="form-control" name="descriere_lunga" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Imagine Reprezentativă</label>
+                        <div class="input-group">
+                            <input type="file" class="d-none" id="inputFisier" name="poza" accept="image/jpeg, image/png" required>
+                            <label class="btn btn-outline-secondary" for="inputFisier">Alege fișierul</label>
+                            <span class="form-control" id="numeFisier">Niciun fișier ales</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 p-3 bg-light border rounded">
+                        <label class="form-label fw-bold text-primary">Imagini Carusel (Selectează mai multe)</label>
+                        <div class="input-group">
+                            <input type="file" class="d-none" id="inputCaruselAdmin" name="poze_carusel[]" accept="image/jpeg, image/png" multiple>
+                            <label class="btn btn-outline-primary" for="inputCaruselAdmin">Alege fișierele</label>
+                            <span class="form-control" id="numeFisiereCaruselAdmin">Niciun fișier ales</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Salvează Galeria</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pentru Imaginea de copertă
+    document.getElementById('inputFisier').addEventListener('change', function(e) {
+        var fileName = e.target.files[0] ? e.target.files[0].name : "Niciun fișier ales";
+        document.getElementById('numeFisier').textContent = fileName;
+    });
+
+    // Pentru Imaginile din carusel (afișează numărul de fișiere dacă sunt mai multe)
+    document.getElementById('inputCaruselAdmin').addEventListener('change', function(e) {
+        let text = "Niciun fișier ales";
+        if (this.files && this.files.length > 1) {
+            text = this.files.length + " fișiere selectate";
+        } else if (this.files && this.files.length === 1) {
+            text = this.files[0].name;
+        }
+        document.getElementById('numeFisiereCaruselAdmin').textContent = text;
+    });
+</script>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4 class="mb-3">Galeriile Tale</h4>
+        <div class="list-group mb-5">
+            {% for gallery in galleries %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">{{ gallery.title }}</h6>
+                        <small class="text-muted">{{ gallery.title_description }}</small>
+                    </div>
+                    <div>
+                        <a href="edit.php?id={{ gallery.id }}" class="btn btn-sm btn-warning me-2">Editează</a>
+                        <a href="admin.php?sterge={{ gallery.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Ești sigur?');">Șterge</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">Nu există galerii momentan.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row" id="sectiune-utilizatori"> <div class="col-md-12">
+        <h4 class="mb-3">Gestionare Utilizatori</h4>
+        
+        <form action="admin.php" method="GET" class="mb-4">
+            <div class="input-group" style="max-width: 400px;">
+                <input type="text" class="form-control" name="search_user" placeholder="Caută după nume sau email..." value="{{ search_query }}">
+                <button class="btn btn-outline-primary" type="submit">Caută</button>
+                {% if search_query %}
+                    <a href="admin.php#sectiune-utilizatori" class="btn btn-outline-secondary">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <div class="table-responsive mb-5">
+            <table class="table table-hover table-bordered shadow-sm bg-white rounded">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Nume Utilizator</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Status</th>
+                        <th>Acțiune</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users_list %}
+                    <tr>
+                        <td><strong>{{ u.user }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            {% if u.role == 'admin' %}
+                                <span class="badge bg-danger">Admin</span>
+                            {% else %}
+                                <span class="badge bg-secondary">User</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_banned == 1 %}
+                                <span class="badge bg-danger">Banat</span>
+                            {% else %}
+                                <span class="badge bg-success">Activ</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if u.role != 'admin' %}
+                                {% if u.is_banned == 1 %}
+                                    <a href="admin.php?action=unban&id_user={{ u.id }}#sectiune-utilizatori" class="btn btn-sm btn-success" onclick="return confirm('Debanezi acest utilizator?');">Debanează</a>
+                                {% else %}
+                                    <a href="admin.php?action=ban&id_user={{ u.id }}#sectiune-utilizatori" class="btn btn-sm btn-danger" onclick="return confirm('Sigur vrei să banezi acest utilizator?');">Banează</a>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled>Indisponibil</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center">Nu s-a găsit niciun utilizator.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4 class="mb-3">Gestionare Comentarii</h4>
+        <div class="table-responsive mb-5">
+            <table class="table table-hover table-bordered shadow-sm bg-white rounded">
+                <thead class="table-secondary">
+                    <tr>
+                        <th style="width: 15%;">Utilizator</th>
+                        <th style="width: 20%;">Galerie</th>
+                        <th style="width: 35%;">Comentariu</th>
+                        <th style="width: 15%;">Data</th>
+                        <th style="width: 15%;">Acțiune</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in comments %}
+                    <tr>
+                        <td><strong>{{ c.user }}</strong></td>
+                        <td><em>{{ c.gallery_title }}</em></td>
+                        <td>{{ c.comment_text | default(c.comment) | default(c.text) | default(c.mesaj) | default('Text indisponibil') }}</td>
+                        <td>{{ c.created_at|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">
+                            <a href="delete_comment.php?id={{ c.id }}" class="btn btn-sm btn-danger" title="Șterge comentariul" onclick="return confirm('Ești sigur?');">🗑️</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center">Nu există comentarii.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4 class="mb-3">Mesaje Primite</h4>
+        <div class="table-responsive mb-5">
+            <table class="table table-striped table-hover shadow-sm bg-white rounded">
+                <thead class="table-dark">
+                    <tr><th>Nume</th><th>Email</th><th>Mesaj</th><th>Data</th></tr>
+                </thead>
+                <tbody>
+                    {% for m in mesaje_contact %}
+                    <tr>
+                        <td>{{ m.nume }}</td>
+                        <td>{{ m.email }}</td>
+                        <td>{{ m.mesaj }}</td>
+                        <td>{{ m.created_at|date("d/m/Y H:i") }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center">Nu există mesaje noi.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.location.search.includes('search_user') || window.location.search.includes('action=')) {
+            const userSection = document.getElementById('sectiune-utilizatori');
+            if (userSection) {
+                userSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    });
+</script>
+{% endblock %}

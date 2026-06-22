@@ -1,0 +1,38 @@
+{% extends 'base.tpl.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white text-center">
+                <h3 class="mb-0" style="color: #ffffff !important;">Trimite-ne un mesaj</h3>
+            </div>
+            <div class="card-body p-4">
+                
+                {% if success %}
+                    <div class="alert alert-success">{{ success }}</div>
+                {% endif %}
+
+                <form id="contactForm" action="contact.php" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Mesajul tău</label>
+                        <textarea class="form-control" name="mesaj" id="mesaj" rows="5" placeholder="Scrie aici mesajul tău..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Trimite mesajul</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        let mesaj = document.getElementById('mesaj').value;
+        if (mesaj.length < 10) {
+            alert("Te rugăm să scrii un mesaj mai detaliat (minim 10 caractere).");
+            e.preventDefault(); 
+        }
+    });
+</script>
+{% endblock %}

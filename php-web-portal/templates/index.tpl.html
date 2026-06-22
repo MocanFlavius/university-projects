@@ -1,0 +1,45 @@
+{% extends 'base.tpl.html' %}
+
+{% block content %}
+    <div id="mainCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {% for slide in slides %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <img src="images/{{ slide.img }}" class="d-block w-100" style="height: 70vh; min-height: 500px; object-fit: cover; object-position: center 20%;" alt="{{ slide.title }}" onerror="this.src='https://via.placeholder.com/800x450?text=Fara+Poza'">
+                    
+                    <div class="carousel-caption d-none d-md-block" style="background-color: rgba(0,0,0,0.6); border-radius: 8px; padding: 10px;">
+                        <h5>{{ slide.title }}</h5>
+                        <p>{{ slide.title_description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <h2 class="mb-4">Ultimele destinații adăugate</h2>
+    <div class="row">
+        {% for gallery in galleries %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="images/{{ gallery.img }}" class="card-img-top" alt="{{ gallery.title }}" style="height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200?text=Fara+Poza'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ gallery.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ gallery.title_description|slice(0, 50) }}</h6>
+                        <p class="card-text">{{ gallery.long_description|slice(0, 100) }}...</p>
+                        <a href="gallery.php?id={{ gallery.id }}" class="btn btn-primary btn-sm">Vezi Galeria</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12"><p>Nu există nicio galerie adăugată.</p></div>
+        {% endfor %}
+    </div>
+{% endblock %}

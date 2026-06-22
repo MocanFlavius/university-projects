@@ -1,0 +1,88 @@
+{% extends 'base.tpl.html' %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12 border-bottom pb-2 mb-4">
+        <h2>Bine ai venit, {{ username }}!</h2>
+        <p class="text-muted">Acesta este panoul tău personal. Aici poți adăuga și gestiona doar propriile tale destinații.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-success" style="color: #ffffff !important;">
+                <h5 class="mb-0" style="color: #ffffff !important;">Adaugă o Destinație Nouă</h5>
+            </div>
+            <div class="card-body">
+                {% if mesaj %}<div class="alert alert-info">{{ mesaj }}</div>{% endif %}
+                <form action="user_panel.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Titlul Galeriei</label>
+                        <input type="text" class="form-control" name="titlu" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Scurtă Descriere</label>
+                        <input type="text" class="form-control" name="descriere_scurta" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descriere Detaliată</label>
+                        <textarea class="form-control" name="descriere_lunga" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Imagine Reprezentativă</label>
+                        <div class="input-group">
+                            <input type="file" class="d-none" id="inputFisierUser" name="poza" accept="image/jpeg, image/png" required>
+                            <label class="btn btn-outline-secondary" for="inputFisierUser">Alege fișierul</label>
+                            <span class="form-control" id="numeFisierUser">Niciun fișier ales</span>
+                        </div>
+                    </div>
+                    <div class="mb-4 p-3 bg-light border rounded">
+                        <label class="form-label fw-bold text-success">Imagini Carusel (Opțional)</label>
+                        <div class="input-group">
+                            <input type="file" class="d-none" id="inputCaruselUser" name="poze_carusel[]" accept="image/jpeg, image/png" multiple>
+                            <label class="btn btn-outline-success" for="inputCaruselUser">Alege fișierele</label>
+                            <span class="form-control" id="numeFisiereCaruselUser">Niciun fișier ales</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Publică Destinația</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <h4 class="mb-3">Destinațiile Postate de Tine</h4>
+        <div class="list-group mb-5 shadow-sm">
+            {% for gallery in galleries %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{ gallery.title }}</h6>
+                        <small class="text-muted">{{ gallery.title_description|slice(0, 50) }}...</small>
+                    </div>
+                    <div>
+                        <a href="edit.php?id={{ gallery.id }}" class="btn btn-sm btn-warning me-1">Editează</a>
+                        <a href="user_panel.php?sterge={{ gallery.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Ești sigur că vrei să ștergi postarea?');">Șterge</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary border-0 text-center">
+                    Nu ai adăugat nicio destinație încă. Începe să îți împărtășești călătoriile!
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('inputFisierUser').addEventListener('change', function(e) {
+        document.getElementById('numeFisierUser').textContent = e.target.files[0] ? e.target.files[0].name : "Niciun fișier ales";
+    });
+    document.getElementById('inputCaruselUser').addEventListener('change', function(e) {
+        let text = "Niciun fișier ales";
+        if (this.files && this.files.length > 1) { text = this.files.length + " fișiere selectate"; } 
+        else if (this.files && this.files.length === 1) { text = this.files[0].name; }
+        document.getElementById('numeFisiereCaruselUser').textContent = text;
+    });
+</script>
+{% endblock %}
